@@ -1,0 +1,21 @@
+{
+  "title": "Ayuda Desk-Grade",
+  "tags": ["desk-grade", "help", "docs"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "never",
+  "panels": [
+    {
+        "id": 1,
+        "title": "Documentación del Sistema Desk-Grade",
+        "type": "text",
+        "gridPos": { "h": 18, "w": 24, "x": 0, "y": 0 },
+      "options": {
+        "mode": "markdown",
+        "content": "## 📘 Documentación Desk-Grade\n\nAccede a los manuales desde tu navegador (servidor local de documentación).\n\n### 1. Arrancar servidor de documentación\n\nEn la carpeta del proyecto `desk-grade-ready` ejecuta en PowerShell:\n\n```bash\npython -m scripts.serve_docs\n```\n\nEsto levanta un servidor en `http://localhost:8001/`.\n\n### 2. Enlaces a los documentos\n\n- **Guía completa**: [GUIA_COMPLETA.md](http://localhost:8001/GUIA_COMPLETA.md)\n- **README (resumen del proyecto)**: [README.md](http://localhost:8001/README.md)\n- **Inicio rápido**: [QUICKSTART.md](http://localhost:8001/QUICKSTART.md)\n- **Guía de dashboards**: [DASHBOARD_GUIDE.md](http://localhost:8001/DASHBOARD_GUIDE.md)\n- **Doc de Grafana**: [grafana/README.md](http://localhost:8001/grafana/README.md)\n\n> Si los enlaces no cargan, asegúrate de que el servidor de documentación\n> (`python -m scripts.serve_docs`) está en ejecución."
+      }
+    }
+  ]
+}
+

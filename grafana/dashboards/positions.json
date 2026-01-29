@@ -1,0 +1,91 @@
+{
+  "title": "Posiciones y Trades",
+  "tags": ["desk-grade", "positions", "trades"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "10s",
+  "panels": [
+    {
+        "id": 1,
+        "title": "Posiciones Abiertas",
+        "type": "table",
+        "gridPos": {"h": 10, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "datasource": {"type": "postgres", "uid": "Desk-Grade PostgreSQL"},
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT symbol, qty, avg_price, realized_pnl, unrealized_pnl, last_updated FROM positions WHERE qty != 0 ORDER BY symbol",
+            "refId": "A"
+          }
+        ]
+    },
+    {
+        "id": 2,
+        "title": "Trades Abiertos",
+        "type": "table",
+        "gridPos": {"h": 10, "w": 12, "x": 12, "y": 0},
+        "targets": [
+          {
+            "datasource": {"type": "postgres", "uid": "Desk-Grade PostgreSQL"},
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT symbol, strategy_id, state, qty, entry_price, stop_price, tp1_price, tp2_price, last_updated FROM trade_state WHERE state IN ('ENTERED', 'MANAGED') ORDER BY symbol",
+            "refId": "A"
+          }
+        ]
+    },
+    {
+        "id": 3,
+        "title": "PnL Realizado vs No Realizado",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 10},
+        "targets": [
+          {
+            "datasource": {"type": "postgres", "uid": "Desk-Grade PostgreSQL"},
+            "editorMode": "code",
+            "format": "time_series",
+            "rawQuery": true,
+            "rawSql": "SELECT last_updated as time, SUM(realized_pnl) as \"PnL Realizado\" FROM positions GROUP BY last_updated ORDER BY last_updated",
+            "refId": "A"
+          },
+          {
+            "datasource": {"type": "postgres", "uid": "Desk-Grade PostgreSQL"},
+            "editorMode": "code",
+            "format": "time_series",
+            "rawQuery": true,
+            "rawSql": "SELECT last_updated as time, SUM(unrealized_pnl) as \"PnL No Realizado\" FROM positions GROUP BY last_updated ORDER BY last_updated",
+            "refId": "B"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "custom": {"axisLabel": "", "axisPlacement": "auto", "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "lineInterpolation": "linear", "lineWidth": 2},
+            "mappings": [],
+            "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]},
+            "unit": "currencyUSD"
+          }
+        }
+    },
+    {
+        "id": 4,
+        "title": "Eventos de Trades (Últimas 24h)",
+        "type": "logs",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 10},
+        "targets": [
+          {
+            "datasource": {"type": "postgres", "uid": "Desk-Grade PostgreSQL"},
+            "editorMode": "code",
+            "format": "logs",
+            "rawQuery": true,
+            "rawSql": "SELECT ts as time, symbol, event_type, description FROM trade_events WHERE ts >= NOW() - INTERVAL '24 hours' ORDER BY ts DESC LIMIT 100",
+            "refId": "A"
+          }
+        ]
+    }
+  ]
+}

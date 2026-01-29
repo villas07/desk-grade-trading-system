@@ -1,0 +1,167 @@
+{
+  "title": "Métricas de Trades",
+  "tags": ["desk-grade", "metrics", "journal"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "30s",
+  "panels": [
+    {
+        "id": 1,
+        "title": "Distribución de R-Múltiples",
+        "type": "histogram",
+        "gridPos": {"h": 8, "w": 8, "x": 0, "y": 0},
+        "targets": [
+          {
+            "datasource": {"type": "postgres", "uid": "Desk-Grade PostgreSQL"},
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT r FROM trade_journal WHERE exit_ts >= NOW() - INTERVAL '30 days'",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "mappings": [],
+            "unit": "short"
+          }
+        }
+    },
+    {
+        "id": 2,
+        "title": "Tasa de Éxito",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 4, "x": 8, "y": 0},
+        "targets": [
+          {
+            "datasource": {"type": "postgres", "uid": "Desk-Grade PostgreSQL"},
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT CASE WHEN COUNT(*) > 0 THEN COUNT(*) FILTER (WHERE r > 0)::float / COUNT(*)::float * 100 ELSE 0 END as value FROM trade_journal WHERE exit_ts >= NOW() - INTERVAL '30 days'",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 40},
+                {"color": "green", "value": 50}
+              ]
+            },
+            "unit": "percent"
+          }
+        }
+    },
+    {
+        "id": 3,
+        "title": "R-Múltiple Promedio",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 4, "x": 12, "y": 0},
+        "targets": [
+          {
+            "datasource": {"type": "postgres", "uid": "Desk-Grade PostgreSQL"},
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT COALESCE(AVG(r), 0) as value FROM trade_journal WHERE exit_ts >= NOW() - INTERVAL '30 days'",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            },
+            "unit": "short"
+          }
+        }
+    },
+    {
+        "id": 4,
+        "title": "Total de Trades",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 4, "x": 16, "y": 0},
+        "targets": [
+          {
+            "datasource": {"type": "postgres", "uid": "Desk-Grade PostgreSQL"},
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT COUNT(*) as value FROM trade_journal WHERE exit_ts >= NOW() - INTERVAL '30 days'",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "mappings": [],
+            "unit": "short"
+          }
+        }
+    },
+    {
+        "id": 5,
+        "title": "MAE vs MFE",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "targets": [
+          {
+            "datasource": {"type": "postgres", "uid": "Desk-Grade PostgreSQL"},
+            "editorMode": "code",
+            "format": "time_series",
+            "rawQuery": true,
+            "rawSql": "SELECT exit_ts as time, mae as \"MAE\" FROM trade_journal WHERE exit_ts >= NOW() - INTERVAL '30 days' ORDER BY exit_ts",
+            "refId": "A"
+          },
+          {
+            "datasource": {"type": "postgres", "uid": "Desk-Grade PostgreSQL"},
+            "editorMode": "code",
+            "format": "time_series",
+            "rawQuery": true,
+            "rawSql": "SELECT exit_ts as time, mfe as \"MFE\" FROM trade_journal WHERE exit_ts >= NOW() - INTERVAL '30 days' ORDER BY exit_ts",
+            "refId": "B"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "custom": {"axisLabel": "", "axisPlacement": "auto", "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "lineInterpolation": "linear", "lineWidth": 2},
+            "mappings": [],
+            "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]},
+            "unit": "short"
+          }
+        }
+      },
+      {
+        "id": 6,
+        "title": "Diario de Trades (Últimos 30 días)",
+        "type": "table",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "targets": [
+          {
+            "datasource": {"type": "postgres", "uid": "Desk-Grade PostgreSQL"},
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT symbol, entry_ts, exit_ts, entry_price, exit_price, qty, r, pnl_r, mae, mfe FROM trade_journal WHERE exit_ts >= NOW() - INTERVAL '30 days' ORDER BY exit_ts DESC LIMIT 50",
+            "refId": "A"
+          }
+        ]
+    }
+  ]
+}

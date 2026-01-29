@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  db:
+    image: timescale/timescaledb:latest-pg14
+    container_name: desk-grade-db
+    environment:
+      POSTGRES_USER: desk
+      POSTGRES_PASSWORD: desk_pass
+      POSTGRES_DB: desk
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./infra/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: desk-grade-grafana
+    depends_on:
+      - db
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
+      GF_DEFAULT_LANGUAGE: es
+      GF_USERS_DEFAULT_LANGUAGE: es
+      GF_I18N_DEFAULT_LANGUAGE: es
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
+
+volumes:
+  db-data:
+  grafana-data:
+

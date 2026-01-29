@@ -1,0 +1,20 @@
+apiVersion: 1
+
+datasources:
+  - name: PostgreSQL Desk-Grade
+    type: postgres
+    access: proxy
+    url: db:5432
+    database: desk
+    user: desk
+    secureJsonData:
+      password: desk_pass
+    jsonData:
+      sslmode: disable
+      maxOpenConns: 100
+      maxIdleConns: 100
+      connMaxLifetime: 14400
+      postgresVersion: 1400
+      timescaledb: true
+    isDefault: true
+    editable: true

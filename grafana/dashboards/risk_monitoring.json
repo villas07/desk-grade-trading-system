@@ -1,0 +1,115 @@
+{
+  "title": "Monitoreo de Riesgo",
+  "tags": ["desk-grade", "risk"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "10s",
+  "panels": [
+    {
+        "id": 1,
+        "title": "Modo de Riesgo",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+        "targets": [
+          {
+            "datasource": {"type": "postgres", "uid": "Desk-Grade PostgreSQL"},
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT mode FROM risk_state ORDER BY ts DESC LIMIT 1",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "mappings": [
+              {"options": {"NORMAL": {"text": "NORMAL"}}, "type": "value", "value": "NORMAL"},
+              {"options": {"DEGRADED": {"text": "DEGRADADO"}}, "type": "value", "value": "DEGRADED"},
+              {"options": {"HALT": {"text": "DETENIDO"}}, "type": "value", "value": "HALT"}
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 1},
+                {"color": "red", "value": 2}
+              ]
+            }
+          }
+        }
+    },
+    {
+        "id": 2,
+        "title": "Eventos de Riesgo (Últimas 24h)",
+        "type": "table",
+        "gridPos": {"h": 8, "w": 12, "x": 6, "y": 0},
+        "targets": [
+          {
+            "datasource": {"type": "postgres", "uid": "Desk-Grade PostgreSQL"},
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT ts, event_type, severity, description FROM risk_events WHERE ts >= NOW() - INTERVAL '24 hours' ORDER BY ts DESC LIMIT 50",
+            "refId": "A"
+          }
+        ]
+    },
+    {
+        "id": 3,
+        "title": "Exposure por Símbolo",
+        "type": "barchart",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "targets": [
+          {
+            "datasource": {"type": "postgres", "uid": "Desk-Grade PostgreSQL"},
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT symbol, net_exposure FROM exposure_snapshots WHERE ts >= NOW() - INTERVAL '1 hour' AND ts = (SELECT MAX(ts) FROM exposure_snapshots e2 WHERE e2.symbol = exposure_snapshots.symbol)",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "custom": {"hideFrom": {"tooltip": false, "viz": false, "legend": false}},
+            "mappings": [],
+            "unit": "currencyUSD"
+          }
+        }
+    },
+    {
+        "id": 4,
+        "title": "Línea de Tiempo del Estado de Riesgo",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "targets": [
+          {
+            "datasource": {"type": "postgres", "uid": "Desk-Grade PostgreSQL"},
+            "editorMode": "code",
+            "format": "time_series",
+            "rawQuery": true,
+            "rawSql": "SELECT ts as time, CASE WHEN mode = 'NORMAL' THEN 0 WHEN mode = 'DEGRADED' THEN 1 ELSE 2 END as value FROM risk_state ORDER BY ts",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "custom": {"axisLabel": "", "axisPlacement": "auto"},
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 1},
+                {"color": "red", "value": 2}
+              ]
+            }
+          }
+        }
+    }
+  ]
+}

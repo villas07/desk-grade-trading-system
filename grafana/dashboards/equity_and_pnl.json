@@ -1,0 +1,164 @@
+{
+  "title": "Equity y PnL",
+  "tags": ["desk-grade", "equity", "pnl"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "10s",
+  "panels": [
+    {
+        "id": 1,
+        "title": "Curva de Equity",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "datasource": {"type": "postgres", "uid": "Desk-Grade PostgreSQL"},
+            "editorMode": "code",
+            "format": "time_series",
+            "rawQuery": true,
+            "rawSql": "SELECT ts as time, balance as value FROM cash_balances ORDER BY ts",
+            "refId": "A",
+            "sql": {
+              "columns": [{"parameters": [], "type": "function"}],
+              "groupBy": [{"property": {"type": "string"}, "type": "groupBy"}],
+              "limit": 50
+            }
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "custom": {"axisLabel": "", "axisPlacement": "auto", "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "lineInterpolation": "linear", "lineWidth": 2, "pointSize": 5, "showPoints": "never"},
+            "mappings": [],
+            "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]},
+            "unit": "currencyUSD"
+          }
+        }
+    },
+    {
+        "id": 2,
+        "title": "PnL Diario",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
+        "targets": [
+          {
+            "datasource": {"type": "postgres", "uid": "Desk-Grade PostgreSQL"},
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT daily_pnl FROM risk_state ORDER BY ts DESC LIMIT 1",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "green", "value": 0}
+              ]
+            },
+            "unit": "currencyUSD"
+          }
+        }
+    },
+    {
+        "id": 3,
+        "title": "PnL Semanal",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+        "targets": [
+          {
+            "datasource": {"type": "postgres", "uid": "Desk-Grade PostgreSQL"},
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT weekly_pnl FROM risk_state ORDER BY ts DESC LIMIT 1",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "green", "value": 0}
+              ]
+            },
+            "unit": "currencyUSD"
+          }
+        }
+    },
+    {
+        "id": 4,
+        "title": "Drawdown %",
+        "type": "gauge",
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 4},
+        "targets": [
+          {
+            "datasource": {"type": "postgres", "uid": "Desk-Grade PostgreSQL"},
+            "editorMode": "code",
+            "format": "table",
+            "rawQuery": true,
+            "rawSql": "SELECT COALESCE(dd_pct * 100, 0) as value FROM risk_state ORDER BY ts DESC LIMIT 1",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "mappings": [],
+            "max": 100,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 10},
+                {"color": "red", "value": 20}
+              ]
+            },
+            "unit": "percent"
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "PnL Diario (Histórico)",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 6, "x": 18, "y": 4},
+        "targets": [
+          {
+            "datasource": {"type": "postgres", "uid": "Desk-Grade PostgreSQL"},
+            "editorMode": "code",
+            "format": "time_series",
+            "rawQuery": true,
+            "rawSql": "SELECT ts as time, daily_pnl as value FROM risk_state ORDER BY ts",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "custom": {"axisLabel": "", "axisPlacement": "auto", "drawStyle": "bars", "fillOpacity": 80, "gradientMode": "none"},
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "green", "value": 0}
+              ]
+            },
+            "unit": "currencyUSD"
+          }
+        }
+    }
+  ]
+}
