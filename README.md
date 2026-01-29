@@ -1,5 +1,22 @@
 ## Desk-Grade Ready
 
+**Desk-Grade Ready** es un sistema de trading **desk-grade** completo para **paper trading**, con gestión de riesgo centralizada, orquestación por scripts y observabilidad vía Grafana.
+
+- **Lenguaje**: Python 3.11+
+- **Base de datos**: PostgreSQL + TimescaleDB
+- **Observabilidad**: Grafana (dashboards en español)
+- **Modo actual**: Paper trading, preparado para integración con brokers reales
+- **CI**: Workflow de GitHub Actions para ejecutar tests en cada push/PR
+
+### Enlaces rápidos
+
+- `QUICKSTART.md` – arranque rápido del sistema.
+- `GUIA_COMPLETA.md` – guía funcional y técnica completa.
+- `DASHBOARD_GUIDE.md` – explicación de todos los dashboards de Grafana.
+- `data_pipeline/README.md` – módulo de ingesta de datos (QuantConnect, IBKR, TradingView, CSV).
+
+---
+
 Este repositorio contiene una versión funcional del **sistema Desk-Grade** orientado a:
 
 - Trading en modo **paper**.
